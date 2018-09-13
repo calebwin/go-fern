@@ -9,6 +9,8 @@ type Rule struct {
   from string
   to string
   weight float32
+  leftContext string
+  rightContext string
 }
 
 type L struct {
@@ -104,6 +106,27 @@ func setWeight(l L, newGrammarRule map[string]string, newWeight float32) L {
 // TODO set parameters
 
 // TODO set context
+func setContext(l L, newGrammarRule map[string]string, newLeftContext string, newRightContext string) L {
+  var newRules map[string]Rule = make(map[string]Rule)
+
+  for from, to := range newGrammarRule {
+    newRule := Rule {
+      to : to,
+      leftContext : newLeftContext,
+      rightContext : newRightContext,
+    }
+    newRules[from] = newRule
+  }
+
+  for from, to := range l.rules {
+      newRules[from] = to
+  }
+
+  return L {
+    l.axiom,
+    newRules,
+  }
+}
 
 // TODO set condition
 
@@ -120,16 +143,26 @@ func iterate_with_rules(str string, rules map[string]Rule, iterations int) strin
 
   var newStr strings.Builder
   for _, char := range str {
+    var char_str string = string(char)
+
     // search for rule for current character
     if _, ok := rules[string(char)]; ok {
-      var charRule Rule = rules[string(char)]
+      var charIndex int = strings.Index(str, char_str)
+      var charRule Rule = rules[char_str]
+
       var isCharRuleValid bool = charRule.weight == 1.0 || rand.Float32() <= charRule.weight
+      if charRule.leftContext != "" && (charIndex - len(charRule.leftContext) < 0 || str[charIndex - len(charRule.leftContext) : charIndex] != charRule.leftContext) {
+        isCharRuleValid = false
+      }
+      if charRule.rightContext != "" && (charIndex + len(charRule.rightContext) >= len(str) || str[charIndex + 1 : charIndex + len(charRule.rightContext) + 1] != charRule.rightContext) {
+        isCharRuleValid = false
+      }
 
       if isCharRuleValid {
         newStr.WriteString(charRule.to)
       }
     } else {
-      newStr.WriteString(string(char))
+      newStr.WriteString(char_str)
     }
   }
 
