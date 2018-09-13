@@ -5,7 +5,10 @@ import (
 )
 
 func TestL(t *testing.T) {
-  var myL L = generate("ABC", map[string]string{"A": "AB"})
+  productionRules := map[string]string{
+    "A": "AB",
+  }
+  var myL L = generate("ABC", productionRules)
   if iterate(myL, 3) != "ABBBBC" {
     t.Fail()
   }
