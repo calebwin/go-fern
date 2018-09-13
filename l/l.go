@@ -6,7 +6,6 @@ import (
 )
 
 type Rule struct {
-  from string
   to string
   weight float32
   leftContext string
@@ -18,85 +17,79 @@ type L struct {
   rules map[string]Rule
 }
 
-func generate(axiom string, grammarRules map[string]string) L {
-  var rules map[string]Rule = make(map[string]Rule)
-
-  for from, to := range grammarRules {
-    grammarRule := Rule {
-      to : to,
-      weight : 1.0,
-    }
-    rules[from] = grammarRule
-  }
-
+func generate(axiom string) L {
   return L {
     axiom,
-    rules,
+    make(map[string]Rule),
   }
 }
 
-func setAxiom(l L, newAxiom string) L {
+func setAxiom(currL L, newAxiom string) L {
   return L {
     newAxiom,
-    l.rules,
+    currL.rules,
   }
 }
 
-func setRules(l L, newGrammarRules map[string]string) L {
+func setGrammar(currL L, newGrammarRules map[string]string) L {
   var newRules map[string]Rule = make(map[string]Rule)
+
+  for from, rule := range currL.rules {
+    newRules[from] = rule
+  }
 
   for from, to := range newGrammarRules {
-    newRule := Rule {
-      to : to,
-      weight : 1.0,
-    }
-    newRules[from] = newRule
+    grammarRule := currL.rules[from]
+    grammarRule.to = to
+    grammarRule.weight = 1.0
+    newRules[from] = grammarRule
   }
 
   return L {
-    l.axiom,
+    currL.axiom,
     newRules,
   }
 }
 
-func setRule(l L, newGrammarRule map[string]string) L {
+func setWeights(currL L, newWeightRules map[string]float32) L {
   var newRules map[string]Rule = make(map[string]Rule)
 
-  for from, to := range newGrammarRule {
-    newRule := Rule {
-      to : to,
-      weight : 1.0,
-    }
-    newRules[from] = newRule
+  for from, rule := range currL.rules {
+    newRules[from] = rule
   }
 
-  for from, to := range l.rules {
-      newRules[from] = to
+  for from, weight := range newWeightRules {
+    grammarRule := currL.rules[from]
+    grammarRule.weight = weight
+    newRules[from] = grammarRule
   }
 
   return L {
-    l.axiom,
+    currL.axiom,
     newRules,
   }
 }
-
-func setWeight(l L, newGrammarRule map[string]string, newWeight float32) L {
+func setContexts(currL L, newLeftContextRules map[string]string, newRightContextRules map[string]string) L {
   var newRules map[string]Rule = make(map[string]Rule)
 
-  for from, to := range newGrammarRule {
-    newRule := Rule {
-      to : to,
-      weight : newWeight,
-    }
-    newRules[from] = newRule
+  for from, rule := range currL.rules {
+    newRules[from] = rule
   }
 
-  for from, to := range l.rules {
-      newRules[from] = to
+  for from, leftContext := range newLeftContextRules {
+    grammarRule := currL.rules[from]
+    grammarRule.leftContext = leftContext
+    newRules[from] = grammarRule
+  }
+
+  for from, rightContext := range newRightContextRules {
+    grammarRule := currL.rules[from]
+    grammarRule.rightContext = rightContext
+    newRules[from] = grammarRule
   }
 
   return L {
-    l.axiom,
+    currL.axiom,
     newRules,
   }
 }
@@ -105,32 +98,11 @@ func setWeight(l L, newGrammarRule map[string]string, newWeight float32) L {
 
 // TODO set parameters
 
-// TODO set context
-func setContext(l L, newGrammarRule map[string]string, newLeftContext string, newRightContext string) L {
-  var newRules map[string]Rule = make(map[string]Rule)
-
-  for from, to := range newGrammarRule {
-    newRule := Rule {
-      to : to,
-      leftContext : newLeftContext,
-      rightContext : newRightContext,
-    }
-    newRules[from] = newRule
-  }
-
-  for from, to := range l.rules {
-      newRules[from] = to
-  }
-
-  return L {
-    l.axiom,
-    newRules,
-  }
-}
-
 // TODO set condition
 
 // TODO set production
+
+// TODO set final
 
 func iterate(l L, iterations int) string {
   return iterate_with_rules(l.axiom, l.rules, iterations)
