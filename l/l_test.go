@@ -16,6 +16,14 @@ func TestBasic(t *testing.T) {
         "",
       },
     },
+    "B" : []Successor{
+      Successor {
+        "BA",
+        1.0,
+        "C",
+        "A",
+      },
+    },
   }
 
   myL = setRules(myL, myRules)
