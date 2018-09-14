@@ -1,5 +1,5 @@
 # l
-A tiny framework for creating Lindenmayer systems. Support is included for stochastic grammars, context-sensitive grammars.
+A tiny framework for creating Lindenmayer systems. Currently supports stochastic grammars, context-sensitive grammars.
 
 # Usage
 ```
