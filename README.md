@@ -3,7 +3,7 @@ A tiny framework for creating Lindenmayer systems. Currently supports stochastic
 
 # Usage
 ```
-var myL = generate("ABC") // create new L-System with an axiom of "ABC"
+var myL = l.generate("ABC") // create new L-System with an axiom of "ABC"
 
 myRules := map[string][]Successor {
   "A" : []Successor{
@@ -23,7 +23,7 @@ myRules := map[string][]Successor {
     },
   },
 }
-myL = setRules(myL, myRules) // set rules for the L-System
+myL = l.setRules(myL, myRules) // set rules for the L-System
 
-iterate(myL, 3) // "ABBBBC" after 3 iterations of the L-System
+l.iterate(myL, 3) // "ABBBBC" after 3 iterations of the L-System
 ```
