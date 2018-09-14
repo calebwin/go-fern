@@ -3,12 +3,27 @@ A tiny framework for creating Lindenmayer systems. Support is included for stoch
 
 # Usage
 ```
-var myL = generate("ABC")
+var myL = generate("ABC") // create new L-System with an axiom of "ABC"
 
-productionRules := map[string]string{
-  "A": "AB",
+myRules := map[string][]Successor {
+  "A" : []Successor{
+    Successor {
+      "AB",
+      1.0,
+      "",
+      "",
+    },
+  },
+  "B" : []Successor{
+    Successor {
+      "BA",
+      1.0,
+      "C",
+      "A",
+    },
+  },
 }
-myL = setGrammar(myL, productionRules)
+myL = setRules(myL, myRules) // set rules for the L-System
 
-iterate(myL, 3) // "ABBBBC"
+iterate(myL, 3) // "ABBBBC" after 3 iterations of the L-System
 ```
