@@ -3,10 +3,11 @@ package l
 import (
   "strings"
   "math/rand"
+  // "fmt"
 )
 
-type Rule struct {
-  to string
+type Successor struct {
+  successor string
   weight float32
   leftContext string
   rightContext string
@@ -14,13 +15,13 @@ type Rule struct {
 
 type L struct {
   axiom string
-  rules map[string]Rule
+  rules map[string][]Successor
 }
 
 func generate(axiom string) L {
   return L {
     axiom,
-    make(map[string]Rule),
+    make(map[string][]Successor),
   }
 }
 
@@ -31,112 +32,84 @@ func setAxiom(currL L, newAxiom string) L {
   }
 }
 
-func setGrammar(currL L, newGrammarRules map[string]string) L {
-  var newRules map[string]Rule = make(map[string]Rule)
+func setRules(currL L, newRules map[string][]Successor) L {
+  currLNewRules := make(map[string][]Successor)
 
-  for from, rule := range currL.rules {
-    newRules[from] = rule
+  for from, currSuccessors := range currL.rules {
+    currLNewRules[from] = currSuccessors
   }
 
-  for from, to := range newGrammarRules {
-    grammarRule := currL.rules[from]
-    grammarRule.to = to
-    grammarRule.weight = 1.0
-    newRules[from] = grammarRule
+  for from, newSuccessors := range newRules {
+    currLNewRules[from] = newSuccessors
   }
 
   return L {
     currL.axiom,
-    newRules,
+    currLNewRules,
   }
 }
 
-func setWeights(currL L, newWeightRules map[string]float32) L {
-  var newRules map[string]Rule = make(map[string]Rule)
-
-  for from, rule := range currL.rules {
-    newRules[from] = rule
-  }
-
-  for from, weight := range newWeightRules {
-    grammarRule := currL.rules[from]
-    grammarRule.weight = weight
-    newRules[from] = grammarRule
-  }
-
-  return L {
-    currL.axiom,
-    newRules,
-  }
-}
-func setContexts(currL L, newLeftContextRules map[string]string, newRightContextRules map[string]string) L {
-  var newRules map[string]Rule = make(map[string]Rule)
-
-  for from, rule := range currL.rules {
-    newRules[from] = rule
-  }
-
-  for from, leftContext := range newLeftContextRules {
-    grammarRule := currL.rules[from]
-    grammarRule.leftContext = leftContext
-    newRules[from] = grammarRule
-  }
-
-  for from, rightContext := range newRightContextRules {
-    grammarRule := currL.rules[from]
-    grammarRule.rightContext = rightContext
-    newRules[from] = grammarRule
-  }
-
-  return L {
-    currL.axiom,
-    newRules,
-  }
+func iterate(currL L, numIterations int) string {
+  return rewrite(currL.axiom, currL.rules, numIterations)
 }
 
-// TODO set axiom parameters
-
-// TODO set parameters
-
-// TODO set condition
-
-// TODO set production
-
-// TODO set final
-
-func iterate(l L, iterations int) string {
-  return iterate_with_rules(l.axiom, l.rules, iterations)
-}
-
-func iterate_with_rules(str string, rules map[string]Rule, iterations int) string {
-  if  iterations == 0 {
+func rewrite(str string, rules map[string][]Successor, numIterations int) string {
+  if numIterations == 0 {
     return str
   }
 
   var newStr strings.Builder
+
   for _, char := range str {
-    var char_str string = string(char)
+    var charStr string = string(char)
+    var charIndex int = strings.Index(str, charStr)
 
-    // search for rule for current character
-    if _, ok := rules[string(char)]; ok {
-      var charIndex int = strings.Index(str, char_str)
-      var charRule Rule = rules[char_str]
+    // check if charStr has a valid successors
+    charStrSuccessors := rules[charStr]
+    if len(charStrSuccessors) > 0 {
+      var successorIndex = -1
 
-      var isCharRuleValid bool = charRule.weight == 1.0 || rand.Float32() <= charRule.weight
-      if charRule.leftContext != "" && (charIndex - len(charRule.leftContext) < 0 || str[charIndex - len(charRule.leftContext) : charIndex] != charRule.leftContext) {
-        isCharRuleValid = false
+      // calculate total weight of all successors, find deterministic successor
+      var totalWeight float32 = 0.0
+      for i, charStrSuccessor := range charStrSuccessors {
+        totalWeight += charStrSuccessor.weight
+        if charStrSuccessor.weight == 1.0 {
+          successorIndex = i
+        }
       }
-      if charRule.rightContext != "" && (charIndex + len(charRule.rightContext) >= len(str) || str[charIndex + 1 : charIndex + len(charRule.rightContext) + 1] != charRule.rightContext) {
-        isCharRuleValid = false
+
+      // random successor
+      if successorIndex == -1 {
+        var randWeight float32 = rand.Float32()
+        var cumulativeWeight float32 = 0.0
+        for i, charStrSuccessor := range charStrSuccessors {
+          if randWeight < cumulativeWeight / totalWeight {
+            successorIndex = i
+          }
+
+          cumulativeWeight += charStrSuccessor.weight
+        }
       }
 
-      if isCharRuleValid {
-        newStr.WriteString(charRule.to)
+      validSuccessor := charStrSuccessors[successorIndex]
+
+      // ensure context is correct
+      if validSuccessor.leftContext != "" && (charIndex - len(validSuccessor.leftContext) < 0 || str[charIndex - len(validSuccessor.leftContext) : charIndex] != validSuccessor.leftContext) {
+        successorIndex = -1
+      }
+      if validSuccessor.rightContext != "" && (charIndex + len(validSuccessor.rightContext) >= len(str) || str[charIndex + 1 : charIndex + len(validSuccessor.rightContext) + 1] != validSuccessor.rightContext) {
+        successorIndex = -1
+      }
+
+      if successorIndex > -1 {
+        newStr.WriteString(charStrSuccessors[0].successor)
+      } else {
+        newStr.WriteString(charStr)
       }
     } else {
-      newStr.WriteString(char_str)
+      newStr.WriteString(charStr)
     }
   }
 
-  return iterate_with_rules(newStr.String(), rules, iterations - 1)
+  return rewrite(newStr.String(), rules, numIterations - 1)
 }

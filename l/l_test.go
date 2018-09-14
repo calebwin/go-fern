@@ -7,25 +7,49 @@ import (
 func TestBasic(t *testing.T) {
   var myL = generate("ABC")
 
-  productionRules := map[string]string{
-    "A": "AB",
+  myRules := map[string][]Successor {
+    "A" : []Successor{
+      Successor {
+        "AB",
+        1.0,
+        "",
+        "",
+      },
+    },
   }
-  myL = setGrammar(myL, productionRules)
+
+  myL = setRules(myL, myRules)
+
+  if iterate(myL, 1) != "ABBC" {
+    t.Fail()
+  }
 
   if iterate(myL, 3) != "ABBBBC" {
     t.Fail()
   }
 }
 
-// func TestContext(t *testing.T) {
-//   productionRules := map[string]string{
-//     "A": "AB",
-//   }
-//   var myL L = generate("ABC", productionRules)
-//
-//   myL = setContext(myL, map[string]string{"A" : "AB",}, "", "B")
-//
-//   if iterate(myL, 3) != "ABBBBC" {
-//     t.Fail()
-//   }
-// }
+func TestContext(t *testing.T) {
+  var myL = generate("ABC")
+
+  myRules := map[string][]Successor {
+    "A" : []Successor{
+      Successor{
+        "AB",
+        1.0,
+        "",
+        "B",
+      },
+    },
+  }
+
+  myL = setRules(myL, myRules)
+
+  if iterate(myL, 1) != "ABBC" {
+    t.Fail()
+  }
+
+  if iterate(myL, 3) != "ABBBBC" {
+    t.Fail()
+  }
+}
