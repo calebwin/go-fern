@@ -5,17 +5,17 @@ A tiny framework for creating Lindenmayer systems. Currently supports stochastic
 ```
 var myL = l.generate("ABC") // create new L-System with an axiom of "ABC"
 
-myRules := map[string][]Successor {
-  "A" : []Successor{
-    Successor {
+myRules := map[string][]l.Successor {
+  "A" : []l.Successor{
+    l.Successor {
       "AB",
       1.0,
       "",
       "",
     },
   },
-  "B" : []Successor{
-    Successor {
+  "B" : []l.Successor{
+    l.Successor {
       "BA",
       1.0,
       "C",
