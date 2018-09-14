@@ -11,6 +11,8 @@ type Successor struct {
   weight float32
   leftContext string
   rightContext string
+  // TODO successorFn
+  // TODO conditionFn
 }
 
 type L struct {
@@ -113,3 +115,5 @@ func rewrite(str string, rules map[string][]Successor, numIterations int) string
 
   return rewrite(newStr.String(), rules, numIterations - 1)
 }
+
+// TODO final
