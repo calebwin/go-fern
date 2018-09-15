@@ -1,14 +1,29 @@
 # l
-A tiny framework for creating Lindenmayer systems. Support is included for stochastic grammars, context-sensitive grammars.
+A tiny framework for creating Lindenmayer systems. Currently supports stochastic grammars, context-sensitive grammars.
 
 # Usage
 ```
-var myL = generate("ABC")
+var myL = l.generate("ABC") // create new L-System with an axiom of "ABC"
 
-productionRules := map[string]string{
-  "A": "AB",
+myRules := map[string][]l.Successor {
+  "A" : []l.Successor{
+    l.Successor {
+      "AB",
+      1.0,
+      "",
+      "",
+    },
+  },
+  "B" : []l.Successor{
+    l.Successor {
+      "BA",
+      1.0,
+      "C",
+      "A",
+    },
+  },
 }
-myL = setGrammar(myL, productionRules)
+myL = l.setRules(myL, myRules) // set rules for the L-System
 
-iterate(myL, 3) // "ABBBBC"
+l.iterate(myL, 3) // "ABBBBC" after 3 iterations of the L-System
 ```
