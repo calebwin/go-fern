@@ -3,6 +3,8 @@ A tiny framework for creating Lindenmayer systems. Currently supports stochastic
 
 # Usage
 ```
+import "github.com/calebwin/l"
+
 var myL = l.generate("ABC") // create new L-System with an axiom of "ABC"
 
 myRules := map[string][]l.Successor {
