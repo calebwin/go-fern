@@ -1,23 +1,23 @@
-# l
-A tiny framework for creating Lindenmayer systems. Currently supports stochastic grammars, context-sensitive grammars.
+# fern
+A tiny library for creating Lindenmayer systems. Currently supports stochastic grammars, context-sensitive grammars.
 
 # Usage
 ```
-import "github.com/calebwin/l"
+import "github.com/calebwin/fern"
 
-var myL = l.generate("ABC") // create new L-System with an axiom of "ABC"
+var myL = fern.generate("ABC") // create new L-System with an axiom of "ABC"
 
-myRules := map[string][]l.Successor {
-  "A" : []l.Successor{
-    l.Successor {
+myRules := map[string][]fern.Successor {
+  "A" : []fern.Successor{
+    fern.Successor {
       "AB",
       1.0,
       "",
       "",
     },
   },
-  "B" : []l.Successor{
-    l.Successor {
+  "B" : []fern.Successor{
+    fern.Successor {
       "BA",
       1.0,
       "C",
@@ -25,7 +25,7 @@ myRules := map[string][]l.Successor {
     },
   },
 }
-myL = l.setRules(myL, myRules) // set rules for the L-System
+myL = fern.setRules(myL, myRules) // set rules for the L-System
 
-l.iterate(myL, 3) // "ABBBBC" after 3 iterations of the L-System
+fern.iterate(myL, 3) // "ABBBBC" after 3 iterations of the L-System
 ```
