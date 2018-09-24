@@ -1,7 +1,7 @@
-# fern
+## What it is
 A tiny library for creating Lindenmayer systems. Currently supports stochastic grammars, context-sensitive grammars.
 
-# Usage
+## How to use it
 ```
 import "github.com/calebwin/fern"
 
